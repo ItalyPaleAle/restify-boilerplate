@@ -14,14 +14,21 @@ var server = restify.createServer({
 	version: '1.0.0'
 })
 
+// Save the config object in the server
+server.appConfig = config
+
 server.use(restify.acceptParser(server.acceptable))
 server.use(restify.queryParser())
 server.use(restify.bodyParser())
+server.use(restify.gzipResponse())
 
-server.get('/echo/:name', function (req, res, next) {
-	res.send(req.params)
-	return next()
-})
+// Enable Cross-Origin Resource Sharing (CORS)
+server.use(restify.CORS({
+	origins: config.allowOrigin ? config.allowOrigin : '*'
+}))
+
+// Routing
+require('./routes')(server)
 
 server.listen(config.httpPort, function () {
 	console.log('%s listening at %s', server.name, server.url)
