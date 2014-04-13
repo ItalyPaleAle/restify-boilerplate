@@ -1,5 +1,6 @@
 var fs = require('fs')
 var restify = require('restify')
+var session = require('./lib/session')
 
 // Load environments
 var config = require(__dirname + '/lib/environment')()
@@ -14,21 +15,38 @@ var server = restify.createServer({
 	version: '1.0.0'
 })
 
-// Save the config object in the server
+// Save the config and session objects in the server
 server.appConfig = config
+server.session = session
 
 server.use(restify.acceptParser(server.acceptable))
 server.use(restify.queryParser())
 server.use(restify.bodyParser())
 server.use(restify.gzipResponse())
+server.pre(restify.pre.sanitizePath()) // Sanitize paths like //foo/////bar// to /foo/bar
 
 // Enable Cross-Origin Resource Sharing (CORS)
+// TODO: see https://github.com/mcavage/node-restify/issues/284#issuecomment-24131644
 server.use(restify.CORS({
 	origins: config.allowOrigin ? config.allowOrigin : '*'
 }))
 
+// Initialize session
+server.pre(function(req, res, next) {
+	restify.pre.sanitizePath()
+	
+	var token = req.header('X-Session-Token', '')
+	session.init(token)
+	
+	console.log(session.isAuthenticated ? 'Authenticated: ' + session.isAuthenticated : 'NOT Authenticated')
+	
+	if(session.isAuthenticated)
+		session.refreshIfNeeded(res, token)
+	return next()
+})
+
 // Routing
-require('./routes')(server)
+require('./routes')(server, restify)
 
 server.listen(config.httpPort, function () {
 	console.log('%s listening at %s', server.name, server.url)
