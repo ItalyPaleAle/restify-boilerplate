@@ -1,6 +1,7 @@
 var fs = require('fs')
 var restify = require('restify')
 var session = require('./lib/session')
+var mongoose = require('mongoose')
 
 // Load environments
 var config = require(__dirname + '/lib/environment')()
@@ -15,9 +16,13 @@ var server = restify.createServer({
 	version: '1.0.0'
 })
 
-// Save the config and session objects in the server
+// Database connection
+mongoose.connect(config.mongodb)
+
+// Save the config, session and mongoose objects in the server
 server.appConfig = config
 server.session = session
+server.mongoose = mongoose
 
 server.use(restify.acceptParser(server.acceptable))
 server.use(restify.queryParser())

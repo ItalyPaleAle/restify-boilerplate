@@ -2,5 +2,8 @@
 	"baseurl":			"https://localhost",
 	"domain":			"localhost",
 	"http-port":		3000,
-	"allow-origin":		["http://localhost", "https://localhost"]
+	
+	"allow-origin":		["http://localhost", "https://localhost"],
+	
+	"mongodb":			"mongodb://localhost/restify-boilerplate"
 }
