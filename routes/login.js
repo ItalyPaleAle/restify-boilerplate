@@ -27,11 +27,15 @@ module.exports = function(server, restify){
 				return next(new restify.InvalidCredentialsError('Email or password wrong'))
 			}
 			
-			var token = session.create(user._id)
-			session.sendHeader(res, token)
-			
-			res.send({result: 1})
-			next()
+			session.create(user._id, function(token) {
+				if(!token)
+					return next(new restify.InternalError('Cannot start the session'))
+				
+				session.sendHeader(res, token)
+				
+				res.send({result: 1})
+				next()
+			})
 		})
 	})
 }

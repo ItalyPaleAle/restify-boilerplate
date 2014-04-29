@@ -36,13 +36,18 @@ server.pre(function(req, res, next) {
 	restify.pre.sanitizePath()
 	
 	var token = req.header('X-Session-Token', '')
-	session.init(token)
-	
-	console.log(session.isAuthenticated ? 'Authenticated: ' + session.isAuthenticated : 'NOT Authenticated')
-	
-	if(session.isAuthenticated)
-		session.refreshIfNeeded(res, token)
-	return next()
+	session.init(token, function(userId) {
+		console.log(session.isAuthenticated ? 'Authenticated: ' + session.isAuthenticated : 'NOT Authenticated')
+		
+		if(session.isAuthenticated) {
+			session.refreshIfNeeded(res, token, function() {
+				next()
+			})
+		}
+		else {
+			next()
+		}
+	})
 })
 
 // Routing
