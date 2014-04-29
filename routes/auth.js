@@ -1,4 +1,3 @@
-var NodePbkdf2 = require('node-pbkdf2')
 var authProvider = require('../lib/authProvider')
 
 module.exports = function(server, restify){
