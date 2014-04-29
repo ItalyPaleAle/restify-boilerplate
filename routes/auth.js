@@ -1,7 +1,7 @@
 var NodePbkdf2 = require('node-pbkdf2')
 
 module.exports = function(server, restify){
-	server.post('/login', function (req, res, next) {
+	server.post('/auth', function (req, res, next) {
 		var session = server.session
 		
 		var email = req.params.email
@@ -36,6 +36,20 @@ module.exports = function(server, restify){
 				res.send({result: 1})
 				next()
 			})
+		})
+	})
+	
+	// Destroy session
+	server.get('/auth/destroy', function (req, res, next) {
+		if(!server.session.isAuthenticated)
+			return next(new restify.NotAuthorizedError('This resource requires authentication'))
+		
+		server.session.destroy(server.session.sessionToken, function(result) {
+			if(!result)
+				return next(new restify.InternalError('Cannot destroy the session'))
+			
+			res.send({result: 1})
+			next()	
 		})
 	})
 }
