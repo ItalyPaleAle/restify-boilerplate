@@ -38,6 +38,14 @@ CORS(server, {
 	exposeHeaders: ['X-Session-Token']
 })
 
+// Include some headers
+server.pre(function(req, res, next) {
+	if (!res.getHeader('Server')) res.setHeader('Server', res.serverName)
+	if (res.version && !res.getHeader('X-Api-Version')) res.setHeader('X-Api-Version', res.version)
+	if (!res.getHeader('X-Request-Id')) res.setHeader('X-Request-Id', req.getId())
+	
+	next()
+})
 
 // Initialize session
 server.pre(function(req, res, next) {
