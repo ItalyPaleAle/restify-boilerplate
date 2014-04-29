@@ -3,7 +3,7 @@
 	"domain":			"localhost",
 	"http-port":		3000,
 	
-	"allow-origin":		["http://localhost", "https://localhost"],
+	"allow-origin":		["http://localhost", "https://localhost", "http://localhost:8000"],
 	
 	"mongodb":			"mongodb://localhost/restify-boilerplate"
 }

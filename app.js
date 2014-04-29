@@ -2,6 +2,7 @@ var fs = require('fs')
 var restify = require('restify')
 var session = require('./lib/session')
 var mongoose = require('mongoose')
+var CORS = require('./lib/CORS')
 
 // Load environments
 var config = require(__dirname + '/lib/environment')()
@@ -31,10 +32,12 @@ server.use(restify.gzipResponse())
 server.pre(restify.pre.sanitizePath()) // Sanitize paths like //foo/////bar// to /foo/bar
 
 // Enable Cross-Origin Resource Sharing (CORS)
-// TODO: see https://github.com/mcavage/node-restify/issues/284#issuecomment-24131644
-server.use(restify.CORS({
-	origins: config.allowOrigin ? config.allowOrigin : '*'
-}))
+CORS(server, {
+	origins: config.allowOrigin ? config.allowOrigin : false,
+	headers: ['X-Session-Token'],
+	exposeHeaders: ['X-Session-Token']
+})
+
 
 // Initialize session
 server.pre(function(req, res, next) {
