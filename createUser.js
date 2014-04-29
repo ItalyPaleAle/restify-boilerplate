@@ -11,7 +11,7 @@ if(!email || !password) {
 	return 1
 }
 
-hasher.encryptPassword(password, function (err, encryptedPassword) {
+hasher.encryptPassword(password, function (err, hashedPassword) {
 	var _id = new ObjectID()
-	console.log(JSON.stringify({_id: _id.toHexString(), email: email, password: encryptedPassword}))
+	console.log(JSON.stringify({_id: _id.toHexString(), email: email, password: hashedPassword}))
 })
