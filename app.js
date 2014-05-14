@@ -14,7 +14,12 @@ var server = restify.createServer({
 	key: fs.readFileSync('ssl/ssl-key.pem'),*/
 	
 	name: 'restify-boilerplate',
-	version: '1.0.0'
+	version: '1.0.0',
+	
+	// Enable PJAX
+	formatters: {
+		'application/pjax; q=0.1': require('lib/pjax')(__dirname + '/views', {global: 1})
+	}
 })
 
 // Database connection
