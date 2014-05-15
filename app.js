@@ -32,7 +32,7 @@ server.mongoose = mongoose
 
 server.use(restify.acceptParser(server.acceptable))
 server.use(restify.queryParser())
-server.use(restify.bodyParser())
+server.use(restify.bodyParser({mapParams: false}))
 server.use(restify.gzipResponse())
 server.pre(restify.pre.sanitizePath()) // Sanitize paths like //foo/////bar// to /foo/bar
 
@@ -43,22 +43,19 @@ CORS(server, {
 	exposeHeaders: ['X-Session-Token']
 })
 
-// Include some headers
 server.pre(function(req, res, next) {
+	// Cleanup path
+	restify.pre.sanitizePath()
+	
+	// Include some headers
 	if (!res.getHeader('Server')) res.setHeader('Server', res.serverName)
 	if (res.version && !res.getHeader('X-Api-Version')) res.setHeader('X-Api-Version', res.version)
 	if (!res.getHeader('X-Request-Id')) res.setHeader('X-Request-Id', req.getId())
 	
-	next()
-})
-
-// Initialize session
-server.pre(function(req, res, next) {
-	restify.pre.sanitizePath()
-	
+	// Initialize session
 	var token = req.header('X-Session-Token', '')
 	session.init(token, function(userId) {
-		console.log(session.isAuthenticated ? 'Authenticated: ' + session.isAuthenticated : 'NOT Authenticated')
+		//console.log(session.isAuthenticated ? 'Authenticated: ' + session.isAuthenticated : 'NOT Authenticated')
 		
 		if(session.isAuthenticated) {
 			session.refreshIfNeeded(res, token, function() {
