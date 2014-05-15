@@ -1,6 +1,9 @@
 var authProvider = require('../lib/authProvider')
 
 module.exports = function(server, restify){
+	
+	var requireAuth = require('../middlewares/requireAuth')(server, restify)
+	
 	server.post('/auth', function (req, res, next) {
 		var session = server.session
 		
@@ -22,10 +25,7 @@ module.exports = function(server, restify){
 	})
 	
 	// Destroy session
-	server.get('/auth/destroy', function (req, res, next) {
-		if(!server.session.isAuthenticated)
-			return next(new restify.NotAuthorizedError('This resource requires authentication'))
-		
+	server.get('/auth/destroy', requireAuth, function (req, res, next) {
 		server.session.destroy(server.session.sessionToken, function(result) {
 			if(!result)
 				return next(new restify.InternalError('Cannot destroy the session'))

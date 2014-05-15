@@ -1,7 +1,8 @@
 module.exports = function(server, restify){
-	server.get('/authenticated', function (req, res, next) {
-		if(!server.session.isAuthenticated)
-			return next(new restify.NotAuthorizedError('This resource requires authentication'))
+	
+	var requireAuth = require('../middlewares/requireAuth')(server, restify)
+	
+	server.get('/authenticated', requireAuth, function (req, res, next) {
 		res.send({hello: server.session.isAuthenticated}) // User id
 		return next()
 	})
