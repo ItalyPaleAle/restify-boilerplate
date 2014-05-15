@@ -32,7 +32,7 @@ server.mongoose = mongoose
 
 server.use(restify.acceptParser(server.acceptable))
 server.use(restify.queryParser())
-server.use(restify.bodyParser({mapParams: false}))
+server.use(restify.bodyParser())
 server.use(restify.gzipResponse())
 server.pre(restify.pre.sanitizePath()) // Sanitize paths like //foo/////bar// to /foo/bar
 
