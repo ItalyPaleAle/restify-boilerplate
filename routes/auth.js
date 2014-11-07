@@ -30,6 +30,9 @@ module.exports = function(server, restify){
 			if(!result)
 				return next(new restify.InternalError('Cannot destroy the session'))
 			
+			// Respond with an empty session header
+			session.sendHeader(res, '')
+			
 			res.send({result: 1})
 			next()	
 		})
