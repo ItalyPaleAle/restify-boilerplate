@@ -5,6 +5,10 @@
 	"scripts": {
 		"start": "node app.js"
 	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/EgoAleSum/restify-boilerplate.git"
+	},
 	"dependencies": {
 		"restify": "2.8.x",
 		"node-pbkdf2": "0.1.x",
