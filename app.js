@@ -19,7 +19,7 @@ var server = restify.createServer({
 	
 	// Enable PJAX
 	formatters: {
-		'application/pjax; q=0.1': require('lib/PJAX')(__dirname + '/views', {global: 1})
+		'application/pjax; q=0.1': require('./lib/PJAX')(__dirname + '/views', {global: 1})
 	}
 })
 
