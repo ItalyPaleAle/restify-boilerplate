@@ -1,5 +1,4 @@
 {
-	"baseurl":			"https://localhost",
 	"domain":			"localhost",
 	"http-port":		3000,
 	

@@ -18,7 +18,7 @@ var server = restify.createServer({
 	
 	// Enable PJAX
 	formatters: {
-		'application/pjax; q=0.1': require('lib/pjax')(__dirname + '/views', {global: 1})
+		'application/pjax; q=0.1': require('lib/PJAX')(__dirname + '/views', {global: 1})
 	}
 })
 
@@ -30,6 +30,13 @@ server.appConfig = config
 server.session = session
 server.mongoose = mongoose
 
+// Exception handling
+server.on('uncaughtException', function (req, res, route, err) {
+	console.error('uncaughtException: %s', err.stack)
+	res.send(new restify.InternalError('An unexpected error occurred'))
+})
+
+// Some builtin (restify) middlewares
 server.use(restify.acceptParser(server.acceptable))
 server.use(restify.queryParser())
 server.use(restify.bodyParser())
@@ -47,7 +54,7 @@ server.pre(function(req, res, next) {
 	// Cleanup path
 	restify.pre.sanitizePath()
 	
-	// Include some headers
+	// Return some headers
 	if (!res.getHeader('Server')) res.setHeader('Server', res.serverName)
 	if (res.version && !res.getHeader('X-Api-Version')) res.setHeader('X-Api-Version', res.version)
 	if (!res.getHeader('X-Request-Id')) res.setHeader('X-Request-Id', req.getId())
@@ -56,13 +63,13 @@ server.pre(function(req, res, next) {
 	var token = req.header('X-Session-Token', '')
 	session.init(token, function(userId) {
 		//console.log(session.isAuthenticated ? 'Authenticated: ' + session.isAuthenticated : 'NOT Authenticated')
-		
 		if(session.isAuthenticated) {
 			session.refreshIfNeeded(res, token, function() {
+				// Load user data here
 				next()
 			})
 		}
-		else {
+		else { // if(session.isAuthenticated)
 			next()
 		}
 	})
@@ -71,6 +78,7 @@ server.pre(function(req, res, next) {
 // Routing
 require('./routes')(server, restify)
 
+// Start the server
 server.listen(config.httpPort, function () {
 	console.log('%s listening at %s', server.name, server.url)
 })

@@ -1,0 +1,4 @@
+{
+	"ignore": ["public/js/*.js"],
+	"ext": "js json dot"
+}
