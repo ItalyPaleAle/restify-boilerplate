@@ -3,6 +3,7 @@ var restify = require('restify')
 var session = require('./lib/session')
 var mongoose = require('mongoose')
 var CORS = require('./lib/CORS')
+var User = require('./models/User')
 
 // Load environments
 var config = require(__dirname + '/lib/environment')()
@@ -36,6 +37,11 @@ server.on('uncaughtException', function (req, res, route, err) {
 	res.send(new restify.InternalError('An unexpected error occurred'))
 })
 
+// Simple library to write text application logs
+var LDLog = require(__dirname + '/lib/LDLog')
+LDLog.init(__dirname + '/applogs/')
+server.applog = LDLog
+
 // Some builtin (restify) middlewares
 server.use(restify.acceptParser(server.acceptable))
 server.use(restify.queryParser())
@@ -65,8 +71,16 @@ server.pre(function(req, res, next) {
 		//console.log(session.isAuthenticated ? 'Authenticated: ' + session.isAuthenticated : 'NOT Authenticated')
 		if(session.isAuthenticated) {
 			session.refreshIfNeeded(res, token, function() {
-				// Load user data here
-				next()
+				// TODO: use caching (see https://github.com/isaacs/node-lru-cache )
+				User.findOne({'_id': session.isAuthenticated}, function(err, result) {
+					if(err) { // DB error
+						throw new Error('Error while initializing session')
+					}
+					else {
+						req.userData = result
+						next()
+					}
+				})
 			})
 		}
 		else { // if(session.isAuthenticated)
