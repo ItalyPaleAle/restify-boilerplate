@@ -8,7 +8,6 @@ module.exports = function(server, restify){
 	 
 	 POST parameters:
 	 	* email (string): email of the user to create
-	 	* name (string): name of the user to create (>= 2 Unicode characters)
 	 	* password (string): password of the user (>= 8 characters, all ASCII standard between 0x20-0x7F)
 	 
 	 Response:
